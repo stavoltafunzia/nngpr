@@ -77,6 +77,15 @@ class NNGPR(SKGaussianProcessRegressor):
 
     n_jobs : int | None, number of parallel jobs to run for fit, predict or sampling
 
+    nn_type : str
+        Search space for the nearest neighbors. Can be either 'kernel-space' or 'input-space'. If 'kernel-space' nearest neighbors
+        are searched in the kernel space, i.e. the neighbors of a query point are the points with the highest covariance w.r.t. the 
+        query point. When 'input-space' nearest neighbors are searched in the input feature space, using euclidean distance.
+
+    batch_size : int
+        Batch size used to split the calculation in batches. Large batch size may cause out of memory errors. Low batch sizes may prevent
+        parallelism exploitation.
+
     """
 
     _parameter_constraints: dict = {
