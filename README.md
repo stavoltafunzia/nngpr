@@ -1,59 +1,55 @@
-# NNGPR: Nearest Neighbors Gaussian Process Regressor
+# Nngpr: Nearest Neighbors Gaussian Process Regressor
 
-This project implements the Nearest Neighbor Gaussian Process Regressor (NNGPR) according to [Datta 2016](https://arxiv.org/abs/1406.7343).
-In a nutshell, this model works by building a local Gaussian Process around the nearest neighbors of a given point. 
-Cuda can be used to speed-up the model significantly. Using scikit-learn class names, currently only kernels of the type WhiteKernel + ConstantKernel * RBF are supported in the Cuda-based implementation.
+This project implements the Nearest Neighbor Gaussian Process Regressor (Nngpr) according to [Datta 2016](https://arxiv.org/abs/1406.7343).
+This model works by building a local Gaussian Process around the kernel-space nearest neighbors of a given point. 
+Since the local Gaussian Process depends only a small number of nearest neighbors, this model  overcomes the quadratic complexity of the standard Gaussian Processes regressor.
+The complexity of Nngpr with n points and m nearest neighbors is n*m^2 for the Gaussian Process kernel and matrix operations, and n^2 for the nearest neighbors search.
+For large datasets the nearest neighbors search becomes the main bottleneck, however it can be accelerated by GPUs.
+Nngpr does not have a quadratic memory footprint since it never stores the full kernel or covariance matrices, thus can be used on datasets much larger than what typically possible with traditional Gaussian Processes.
 
+Some very basic benchmarks are provided in the notebook `benchmark.ipynb`. 
 
-##### Advantages over standard Gaussian Process Regressor
+#### Python requirements
 
-NNGPR overcomes quadratic complexity of the standard Gaussian Processes. The complexity of a NNGPR with M nearest neighbors is N*M^2
-for the Gaussian Process part (kernel and matrix operations, usually the bottleneck), and N^2 for the nearest neighbors search. 
-Moreover NNGPR does not have a quadratic memory usage since it never stores the full kernel or covariance matrix, thus allows to use GPs on large datasets.
+- scikit-learn (tested on v1.6.1)
 
+Requirements to use CudaNngpr:
 
-##### Python requirements
+- cupy (with cusolver and cublas, tested on cupy-cuda12x v13.4.1)
 
-- scikit-learn (tested on 1.6.1)
+Requirements to use TorchNngpr:
 
-Requirements to use the Cuda-based NNGPR (CUNNGPR):
-
-- cupy (with cusolver and cublas)
+- torch (tested on v2.7.0)
+- cupy is highly suggested if cuda devices are being used
 
 Optional requirements to run the benchmark notebook:
 
 - matplotlib
 - ucimlrepo
-- gpytorch (if you want to run VNNGP)
+- gpytorch (if you want to run GPyTorch models, tested on gpytorch v1.14)
 
 
-##### Usage exmaple
+#### Usage
 
-Nearest Neighbor Gaussian Process Regressor is implementend in two classes: `nngpr.nngpr.NNGPR` runs on CPU, while `nngpr.cunngpr.CUNNGPR` runs on GPU through `cupy`.
-Both classes exposes a scikit-learn-like interface, and scikit-learn kernels should be used. 
+Nearest Neighbor Gaussian Process Regressor is implementend with a scikit-learn-like interface. 
+Nngpr must be used with kernels that inherits from `nngpr.batched_kernels.BatchedKernel`; the package `nngpr.batched_kernels` already provides a sckit-learn-like implementation of the most common kernels.
 
+There are three different implementations of Nngpr:
 
-```
-from sklearn import datasets
-from sklearn.gaussian_process import kernels
+- Numpy-based (NumpyNngpr): this is the simplest implementation and requires only scikit-learn as dependency. It runs on CPU and is not practically usable for large datasets as it would turn out to be rather slow (see `benchmark.ipynb` for some rough numbers).
+- Cupy-based (CudaNngpr): this implementation uses `cupy` to run on Nvidia GPUs.
+- Torch-based (TorchNngpr): this implementation uses `pytorch` and can potentially run on any pytorch device. Kernels of the type WhiteKernel + ConstantKernel * RBF can benefit from substantial speed-up if cupy is also installed, as custom Cuda kernels (here kernels refers to Cuda software) can be exploited.
 
-#from nngpr import NNGPR  # Use this if you want to use the CPU-only implementation
-from nngpr.cunngpr import CUNNGPR
+CudaNngpr and TorchNngpr have practically the same performance on Cuda GPUs. NumpyNngpr performs better than cpu-based TorchNngpr.
 
-data = datasets.fetch_california_housing()
-x = data['data']
-y = data['target']
+For specific examples on using Nngpr please see the `examples` folder.
 
-kernel = kernels.ConstantKernel(1) * kernels.RBF(1) + kernels.WhiteKernel(1)
-mdl = CUNNGPR(allow_downcast_f32='only-nn')  # Use mdl = NNGPR(n_jobs=-1) if you want to use the CPU-only implementation
-mdl.fit(x, y)
-mdl.predict(x)
-```
 
 ##### Run unittests
 
-`python -m test.test_nngpr`
+Some unittest are included to check that everything works:
 
-or, to test the Cuda-based implementation
-
-`python -m test.test_cunngpr`
+- `python -m test.test_batched_kernels`
+- `python -m test.test_numpy_nngpr` (make take a few minutes to run)
+- `python -m test.test_cuda_nngpr` (run only if you have `cupy` installed)
+- `python -m test.test_torch_nngpr` (run only if you have `torch` installed)
