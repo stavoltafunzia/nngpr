@@ -1,9 +1,9 @@
-import unittest
 import itertools
 from abc import abstractmethod, ABC
 
 import numpy as np
 from sklearn import gaussian_process as skgp
+
 from nngpr.base_nngpr import NngprWorker
 from nngpr import batched_kernels
 from nngpr.numpy_nngpr import NumpyProxy

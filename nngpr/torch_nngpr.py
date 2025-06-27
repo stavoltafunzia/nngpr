@@ -5,7 +5,11 @@ import importlib
 import warnings
 
 import numpy as np
-import torch
+
+try:
+    import torch
+except ImportError:
+    raise ImportError("This module requires torch. Install with `pip install nngpr[torch]`")
 
 from .base_nngpr import Nngpr, NngprWorker, ArrayModule
 

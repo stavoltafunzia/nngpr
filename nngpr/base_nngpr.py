@@ -35,7 +35,7 @@ class Nngpr(GaussianProcessRegressor, ABC):
     It is built on top of sklearn GaussianProcessRegressor, maintaining similar apis.
 
     End users are not supposed to use this class directly, rather other helpers provided in nngpr.numpy_nngpr, 
-    nngpr.cuda_nngpr, nngpr.torch_nngpr. Use this class if you know what you are doing.
+    nngpr.cupy_nngpr, nngpr.torch_nngpr. Use this class if you know what you are doing.
 
 
     Parameters

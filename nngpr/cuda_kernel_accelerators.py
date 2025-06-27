@@ -7,8 +7,12 @@ import numbers
 import copy
 
 import numpy as np
-import cupy as cp
 from sklearn.gaussian_process import kernels
+
+try:
+    import cupy as cp
+except ImportError:
+    raise ImportError("This module requires cupy. Install with `pip install nngpr[cupy]`")
 
 
 class CudaKernelAccelerator:

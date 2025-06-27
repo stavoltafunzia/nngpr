@@ -1,8 +1,8 @@
-""" This exmaple fits a simple CudaNngpr model on the california housing dataset """
+""" This exmaple fits a simple CupyNngpr model on the california housing dataset """
 import numpy as np
 from sklearn import datasets
 
-from nngpr.cuda_nngpr import CudaNngpr
+from nngpr.cupy_nngpr import CupyNngpr
 from nngpr import batched_kernels
 
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # Train
     print("Fitting")
     kernel = batched_kernels.WhiteKernel() + batched_kernels.ConstantKernel() * batched_kernels.RBF(np.ones(x.shape[1]))
-    mdl = CudaNngpr(num_nn=64)
+    mdl = CupyNngpr(num_nn=64)
     mdl.fit(x, y)
 
     # Predict

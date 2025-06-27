@@ -4,7 +4,7 @@ from nngpr import batched_kernels
 from nngpr.numpy_nngpr import NumpyWorker, NumpyNngpr
 import numpy as np
 
-from test.nngpr_base_tester import NngprTester, WorkerTester
+from nngpr.test.nngpr_base_tester import NngprTester, WorkerTester
 
 
 class TestNumpyWorker(WorkerTester, unittest.TestCase):

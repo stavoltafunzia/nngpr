@@ -1,7 +1,6 @@
 """ This exmaple fits a simple TorchNngpr model on the california housing dataset.
 Cuda GPU is used if available """
 import torch
-
 import numpy as np
 from sklearn import datasets
 

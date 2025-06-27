@@ -2,15 +2,19 @@ import numbers
 import functools
 
 import numpy as np
-import cupy as cp
-from cupy.cuda import device
-from cupy_backends.cuda.libs import cublas
+
+try:
+    import cupy as cp
+    from cupy.cuda import device
+    from cupy_backends.cuda.libs import cublas
+except ImportError:
+    raise ImportError("This module requires cupy. Install with `pip install nngpr[cupy]`")
 
 from .base_nngpr import Nngpr, NngprWorker, ArrayModule
 from .cuda_kernel_accelerators import CudaKernelAccelerator
 
 
-class CudaNngpr(Nngpr):
+class CupyNngpr(Nngpr):
 
     """ This class is the Nngpr end-user interface that uses a Cupy-based backend.
     

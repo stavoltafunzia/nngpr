@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nngpr"
+version = "0.1.0"
+description = "Nearest Neighbors Gaussian Process Regressor"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [
+  { name="Nicola Dal Bianco" }
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "numpy>=2.0",
+  "scipy>=1.15",
+  "scikit-learn>=1.6"
+]
+
+[project.optional-dependencies]
+cupy = [
+  "cupy-cuda12x>=13.4"
+]
+torch = [
+  "torch>=2.7",
+  "cupy-cuda12x>=13.4"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/stavoltafunzia/nngpr"
+"Bug Tracker" = "https://github.com/stavoltafunzia/nngpr/issues"
+
+[tool.setuptools]
+packages = [
+  "nngpr",
+  "nngpr.test"
+]

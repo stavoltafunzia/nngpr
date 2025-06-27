@@ -1,10 +1,13 @@
 import unittest
 
-import torch
-from nngpr.torch_nngpr import TorchWorker, TorchNngpr, TorchProxy
+try:
+    import torch
+    from nngpr.torch_nngpr import TorchWorker, TorchNngpr, TorchProxy
+except ImportError:
+    raise unittest.SkipTest("Requires nngpr[torch]")
 
-from test.nngpr_base_tester import NngprTester, WorkerTester
-from test.test_batched_kernels import TestBatchedKernels
+from nngpr.test.nngpr_base_tester import NngprTester, WorkerTester
+from nngpr.test.test_batched_kernels import TestBatchedKernels
 
 
 class TestBatchedKernelsTorch(TestBatchedKernels):
