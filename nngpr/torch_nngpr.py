@@ -169,20 +169,6 @@ class TorchProxy(ArrayModule):
             return x
         return x.to(dtype=torch.float32)
 
-    def __getattr__(self, name):
-        """ Exposes torch attributes in this class """
-        if (fn := self.overrides_map.get(name)) is not None:
-            return fn
-        
-        if name in {'empty', 'zeros', 'ones', 'full', 'asarray', 'eye', 'arange'}:
-            return functools.partial(self.redirect_with_device, name)
-        
-        attr = getattr(torch, name)
-        if not callable(attr):
-            return attr
-        
-        return functools.partial(self.generic_redirect, attr)
-    
     @staticmethod
     def convert_args(*args, **kwargs):
         """ Converts numpy dtypes to torch dtypes in the args or kwargs """
@@ -210,6 +196,23 @@ class TorchProxy(ArrayModule):
     def cdist(self, x, y):
         """ Implements parent class abstract method. See parent class docstring """
         return torch.cdist(x, y)
+    
+    def __getattr__(self, name):
+        """ Exposes torch attributes in this class """
+        if (fn := self.overrides_map.get(name)) is not None:
+            return fn
+        
+        if name in {'empty', 'zeros', 'ones', 'full', 'asarray', 'eye', 'arange'}:
+            return functools.partial(self.redirect_with_device, name)
+        
+        attr = getattr(torch, name)
+        if not callable(attr):
+            return attr
+        
+        return functools.partial(self.generic_redirect, attr)
+    
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
 
 class TorchWorker(NngprWorker):

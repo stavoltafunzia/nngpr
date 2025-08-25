@@ -1,4 +1,6 @@
 import unittest
+import pickle
+import tempfile
 
 try:
     import cupy as cp
@@ -37,6 +39,16 @@ class TestCupyNngpr(NngprTester, unittest.TestCase):
         kwargs['batch_size'] = kwargs.get('batch_size', 7)
         gpr = CupyNngpr(kernel=kernel, num_nn=num_nn, **kwargs)
         return gpr
+    
+
+class TestCupyProxy(unittest.TestCase):
+        
+    def test_pickle(self):
+        with tempfile.TemporaryFile(mode='w+b') as f:
+            pickle.dump(CupyProxy(0), f)
+            f.seek(0)
+            tmp = pickle.load(f)
+            tmp.empty(5)
 
 
 if __name__ == '__main__':

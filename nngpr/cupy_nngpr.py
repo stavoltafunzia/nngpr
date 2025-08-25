@@ -128,14 +128,6 @@ class CupyProxy(ArrayModule):
         """ Implements parent class abstract method. See parent class docstring """
         return x.astype(np.float32, copy=False)
 
-    def __getattr__(self, name):
-        """ Exposes cupy attributes in this class """
-        if (fn := self.overrides_map.get(name)) is not None:
-            return fn
-        if name in {'empty', 'zeros', 'ones', 'full', 'eye', 'arange'}:
-            return functools.partial(self.redirect_with_device, name)
-        return getattr(cp, name)
-    
     def redirect_with_device(self, name, *args, **kwargs):
         """ Executes the cupy callable named `name` with arguments *args and **kwargs inside the GPU at index self.cuda_device_index """
         with cp.cuda.Device(self.cuda_device_index):
@@ -167,6 +159,17 @@ class CupyProxy(ArrayModule):
         """ Adds numpy.asarray interface to cupy """
         with cp.cuda.Device(self.cuda_device_index):
             return cp.array(x, copy=copy, **kwargs)
+        
+    def __getattr__(self, name):
+        """ Exposes cupy attributes in this class """
+        if (fn := self.overrides_map.get(name)) is not None:
+            return fn
+        if name in {'empty', 'zeros', 'ones', 'full', 'eye', 'arange'}:
+            return functools.partial(self.redirect_with_device, name)
+        return getattr(cp, name)
+    
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
 
 class CudaWorker(NngprWorker):

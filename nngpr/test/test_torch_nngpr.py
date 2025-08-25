@@ -1,4 +1,6 @@
 import unittest
+import pickle
+import tempfile
 
 try:
     import torch
@@ -42,6 +44,16 @@ class TestTorchNngpr(NngprTester, unittest.TestCase):
         kwargs['batch_size'] = kwargs.get('batch_size', 7)
         gpr = TorchNngpr(['cuda:0' if torch.cuda.is_available() else 'cpu'], kernel=kernel, num_nn=num_nn, **kwargs)
         return gpr
+    
+
+class TestTorchProxy(unittest.TestCase):
+        
+    def test_pickle(self):
+        with tempfile.TemporaryFile(mode='w+b') as f:
+            pickle.dump(TorchProxy('cuda:0' if torch.cuda.is_available() else 'cpu'), f)
+            f.seek(0)
+            tmp = pickle.load(f)
+            tmp.empty(5)
 
 
 if __name__ == '__main__':
